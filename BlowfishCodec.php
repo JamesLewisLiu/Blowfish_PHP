@@ -218,7 +218,6 @@ class BlowfishCodec
         fclose($file);
     }
 
-}
 
 	//decrypt ciphertext
     public function inputDecrypt($dir, $rawCipherText)
@@ -339,6 +338,7 @@ class BlowfishCodec
         }
 
     }
+}
 
 
 ?>
