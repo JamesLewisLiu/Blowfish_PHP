@@ -144,6 +144,11 @@ class BlowfishCodec
 
 
         $file = fopen($dir.'/cipherText', "w+");
+
+        //turn all CR+LF/LF+CR/CR/LF into LF
+        $rawPlainText = str_replace("\r", "\n", $rawPlainText);
+        $rawPlainText = str_replace("\n\n", "\n", $rawPlainText);
+
         $dataLen = strlen($rawPlainText);
 
         $dataInput = unpack("C*", $rawPlainText);
@@ -321,6 +326,11 @@ class BlowfishCodec
                 }
                 //resize the fileStream to original plaintext length (remove the aligned zeroes from the end)
                 $fileStream = substr($fileStream, 0, $plainTextLenFromEnd);
+
+                //turn all CR+LF/LF+CR/CR/LF into CR+LF output
+                $fileStream = str_replace("\r", "\n", $fileStream);
+                $fileStream = str_replace("\n\n", "\n", $fileStream);
+                $fileStream = str_replace("\n", "\r\n", $fileStream);
 
                 $file = fopen($dir.'/plainText.txt', "w+");
                 fwrite($file, $fileStream);
