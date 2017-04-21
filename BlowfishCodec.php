@@ -44,20 +44,7 @@ class BlowfishCodec
             ),
         );
 
-        //bind P-Box with key
-        //by looped-orderly taking 4 bytes (i.e. 4 elements, since each element contains 8 bits(1 byte)) from key in each cycle, and XOR it with P-Box[i],
-        //until all P-Boxes are handled
-        $index = 0;
-        $keySize = count($key);
-        for ($i = 0; $i < 18; $i++)
-        {
-            $byte4 = $key[($index % $keySize) + 1] << 24;
-            $byte4 |= $key[($index + 1) % $keySize + 1] << 16;
-            $byte4 |= $key[($index + 2) % $keySize + 1] << 8;
-            $byte4 |= $key[($index + 3) % $keySize + 1];
-            $this->pBox[$i] ^= $byte4 & 0xFFFFFFFF;
-            $index = ($index + 4) % $keySize;
-        }
+        $this->bindKey($this->pBox, $key);
 
         $L = 0;
         $R = 0;
@@ -88,6 +75,23 @@ class BlowfishCodec
         return ($this->sBox[0][($a >> 24) & 0xFF] + $this->sBox[1][($a >> 16) & 0xFF])
         ^ $this->sBox[2][($a >> 8) & 0xFF] + $this->sBox[3][$a & 0xFF];
 
+    }
+
+    //bind P-Box with key
+    //by looped-orderly taking 4 bytes (i.e. 4 elements, since each element contains 8 bits(1 byte)) from key in each cycle, and XOR it with P-Box[i],
+    //until all P-Boxes are handled
+    private function bindKey(array &$pBox, array $key){
+        $index = 0;
+        $keySize = count($key);
+        for ($i = 0; $i < 18; $i++)
+        {
+            $byte4 = $key[($index % $keySize) + 1] << 24;
+            $byte4 |= $key[($index + 1) % $keySize + 1] << 16;
+            $byte4 |= $key[($index + 2) % $keySize + 1] << 8;
+            $byte4 |= $key[($index + 3) % $keySize + 1];
+            $pBox[$i] ^= $byte4 & 0xFFFFFFFF;
+            $index = ($index + 4) % $keySize;
+        }
     }
 
 	//encrypt L and R
